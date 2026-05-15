@@ -23,7 +23,19 @@
             padding: 30px; border-radius: 30px;
             width: 85%; max-width: 400px;
             text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            z-index: 10;
+            z-index: 10; position: relative;
+        }
+
+        /* Volume Toggle Button */
+        #mute-toggle {
+            position: absolute; top: 20px; right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none; border-radius: 50%;
+            width: 40px; height: 40px;
+            color: white; cursor: pointer;
+            font-size: 18px; display: flex;
+            align-items: center; justify-content: center;
+            transition: 0.3s;
         }
 
         .choice-btn {
@@ -74,6 +86,7 @@
 </audio>
 
 <div id="main-card">
+    <button id="mute-toggle" onclick="toggleMute()">🔇</button>
     <div id="icon-box" style="font-size: 60px; margin-bottom: 10px;">🏔️</div>
     <h2 id="heading">Next week 🏔️ jabi ki jabinaa??😒</h2>
     
@@ -85,7 +98,7 @@
     </div>
 
     <div id="status-text" style="margin-top:15px; min-height:40px; font-style:italic; font-size:14px; color: var(--accent);">
-        Select an option to see the vibe...
+        Tap the 🔇 icon to enable sounds!
     </div>
 
     <div id="final-tab">
@@ -110,12 +123,24 @@
     const happySound = document.getElementById('happy-audio');
     const sadSound = document.getElementById('sad-audio');
     const successSound = document.getElementById('success-audio');
+    let isMuted = true;
+
+    function toggleMute() {
+        isMuted = !isMuted;
+        const btn = document.getElementById('mute-toggle');
+        const status = document.getElementById('status-text');
+        btn.innerHTML = isMuted ? '🔇' : '🔊';
+        status.innerHTML = isMuted ? "Sound Disabled" : "Sound Enabled! Now pick an option.";
+        if(isMuted) stopAllMusic();
+    }
 
     function stopAllMusic() {
         [happySound, sadSound, successSound].forEach(s => { s.pause(); s.currentTime = 0; });
     }
 
     function changeTheme(opt) {
+        if(isMuted) return; // Don't play if still muted
+
         const body = document.body;
         const status = document.getElementById('status-text');
         const icon = document.getElementById('icon-box');
@@ -151,7 +176,7 @@
     function confirmTrip(n) {
         if(n === 3) { alert("Wrong choice! Selecting '3' is restricted by Destiny. 😜"); return; }
         stopAllMusic();
-        successSound.play();
+        if(!isMuted) successSound.play();
         
         document.getElementById('main-card').style.display = 'none';
         const final = document.getElementById('final-page');
